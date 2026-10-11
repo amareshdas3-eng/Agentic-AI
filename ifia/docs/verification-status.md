@@ -59,3 +59,19 @@ See [source-import-audit.md](source-import-audit.md) for the finding-by-finding 
 - [ ] Reproduce the 17 tests and both build commands from a clean install.
 - [ ] Inspect and run the reported Node 20/22 CI workflow.
 - [ ] Reassess deployment hold after evidence review.
+
+
+## Updated source import and residual verification gates — 2026-10-11
+
+The updated application source has been copied to `ifia/app/` on branch `ifia/source-import-v2` from upstream IFIA commit `bcad05d94881621e1a221f8a3ef374a1164cadf2`. It has not been merged into `main`.
+
+Additional source review found a residual authentication risk: static shared principal tokens are embedded in `server/services/authService.ts`; unauthenticated `GET /api/auth/principals` returns the default engineer token; and `AUTH_SECRET` has a predictable hard-coded fallback. This can undermine the approval authorization control. See [source-import-audit.md](source-import-audit.md).
+
+- [x] Import tracked application source to an isolated review branch, excluding secrets, dependencies, built output, and mutable runtime data.
+- [ ] Remove public token disclosure and static shared tokens.
+- [ ] Require a strong configured auth secret; fail startup if missing/weak in non-test mode.
+- [ ] Add integration tests for actual HTTP authorization routes.
+- [ ] Reconcile the README's 9-test badge with the reported 17-test suite.
+- [ ] Verify CI branch/Node matrix against the intended Node 20/22 policy.
+- [ ] Reproduce clean install, tests, server build, client build, and benchmark.
+- [ ] Reassess deployment hold after all gates pass.

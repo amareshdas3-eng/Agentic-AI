@@ -31,3 +31,8 @@ The supplied report describes evidence-linked RCA hypotheses, Zod contracts, a C
 - [ ] Review all engineering actions and standards references with qualified site/OEM personnel before any real-world use.
 
 This directory currently contains documentation only. The archive has been reviewed, but no executable IFIA application files have been added to GitHub yet. The source audit identifies issues that must be addressed before production use.
+
+
+## Updated Antigravity source
+
+The reviewed source snapshot is available under [`app/`](app/) on the `ifia/source-import-v2` review branch. It was copied from upstream `amareshdas3-eng/IFIA` commit `bcad05d94881621e1a221f8a3ef374a1164cadf2`. Review [the source audit](docs/source-import-audit.md) before deployment; authentication hardening and independent build/test verification remain open.
