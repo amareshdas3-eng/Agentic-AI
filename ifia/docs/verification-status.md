@@ -44,3 +44,18 @@
 - [ ] Document exact import commit, runtime versions, commands, exit codes, and artifacts.
 
 The archive's tests were attempted, but no assertions executed because of test-runner invocation and platform-specific `node_modules` problems. See the source audit for details.
+
+
+## Follow-up remediation claims supplied 2026-10-11
+
+The project owner reports that IFIA-SEC-001 through IFIA-SEC-006 have been remediated in a newer working copy and that 17 tests, server compilation, and client bundle build pass. The owner also reports a Node 20/22 CI workflow. These are **owner-reported claims**; the newer source, tests, and workflow have not yet been transferred into this repository or independently rerun here.
+
+See [source-import-audit.md](source-import-audit.md) for the finding-by-finding report and evidence needed to verify closure.
+
+- [ ] Obtain updated source containing the remediation commits.
+- [ ] Review authentication and server-side role enforcement.
+- [ ] Verify approval records cannot be forged or reused for a different case revision.
+- [ ] Verify CMMS external modes fail closed and sandbox results are unmistakably simulated.
+- [ ] Reproduce the 17 tests and both build commands from a clean install.
+- [ ] Inspect and run the reported Node 20/22 CI workflow.
+- [ ] Reassess deployment hold after evidence review.
