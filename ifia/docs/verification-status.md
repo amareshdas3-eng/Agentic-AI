@@ -75,3 +75,14 @@ Additional source review found a residual authentication risk: static shared pri
 - [ ] Verify CI branch/Node matrix against the intended Node 20/22 policy.
 - [ ] Reproduce clean install, tests, server build, client build, and benchmark.
 - [ ] Reassess deployment hold after all gates pass.
+
+
+## Local verification attempt — 2026-10-11
+
+- [x] Attempted clean `npm ci`.
+- [ ] Dependency installation completed — timed out in this execution environment.
+- [ ] Tests independently passed — not established; `npm test` could not resolve `tsx` because installation was incomplete, so assertions did not run.
+- [ ] Server/client builds independently passed — not run after a successful clean install.
+- [ ] CI result for draft PR — check the [pull request checks](https://github.com/amareshdas3-eng/Agentic-AI/pull/1) after the workflow completes.
+
+Do not interpret the incomplete-install test invocation as a code test failure or as a successful verification.
