@@ -1,0 +1,63 @@
+name: IFIA Source CI
+
+on:
+  push:
+    branches:
+      - main
+      - "ifia/**"
+    paths:
+      - "ifia/app/**"
+      - ".github/workflows/ifia-ci.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "ifia/app/**"
+      - ".github/workflows/ifia-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Build and test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+    defaults:
+      run:
+        working-directory: ifia/app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: ifia/app/package-lock.json
+
+      - name: Install clean dependencies
+        run: npm ci
+
+      - name: Compile server
+        run: npm run build:server
+
+      - name: Build client
+        run: npm run build:client
+
+      - name: Run automated tests
+        run: npm test
+        env:
+          CMMS_MODE: SANDBOX
+          AUTH_SECRET: ci-only-not-a-production-secret-rotate-before-deployment
+
+      - name: Run benchmark harness
+        run: npm run benchmark
+        env:
+          CMMS_MODE: SANDBOX
+          AUTH_SECRET: ci-only-not-a-production-secret-rotate-before-deployment

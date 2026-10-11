@@ -132,3 +132,35 @@ The project owner reports 17 tests passed, zero failed, zero cancelled; server T
 5. Review the CI workflow and obtain a successful run linked to the exact source commit.
 
 Until that evidence is available, keep the deployment disposition at **HOLD pending independent verification**. The reported remediations are encouraging, but they do not change the contents of the original archive or prove that the updated implementation is already committed to GitHub.
+
+
+## Updated source archive imported to review branch — 2026-10-11
+
+The project owner supplied an updated archive whose embedded Git repository points to `amareshdas3-eng/IFIA`. The source commit inspected and imported is `bcad05d94881621e1a221f8a3ef374a1164cadf2` (`feat(security): harden authorization boundaries, cryptographic audit logs, and test gates (IFIA-SEC-001 to 006)`). Its tracked source tree was copied under `ifia/app/` on review branch `ifia/source-import-v2`, preserving the original file contents. The import excludes `.env`, `node_modules/`, built `client/dist/`, mutable `data_store/*.json`, and Git metadata. The source tree includes `.env.example`, lockfile, tests, and CI workflow.
+
+### Residual high-priority authentication concern discovered in the updated source
+
+The reported SEC-001 fix is not sufficient for deployment in this snapshot:
+
+- `server/services/authService.ts` contains static shared principal tokens in source code.
+- `server/index.ts` exposes `GET /api/auth/principals` without authentication and returns `default_token` from `authService.getDefaultEngineerToken()`.
+- `server/config.ts` falls back to a predictable hard-coded `AUTH_SECRET` value when the environment variable is absent.
+
+Together, these permit an unauthenticated caller to obtain a token that maps to an approval-capable principal, and the predictable fallback weakens signed-token security. Remove the public token-returning endpoint, eliminate hard-coded shared tokens, require a strong configured secret at startup, and add HTTP-level tests that call the actual routes anonymously and with forged identities.
+
+### Verification scope and discrepancies
+
+- The archive's embedded source commit is `bcad05d94881621e1a221f8a3ef374a1164cadf2`; source files were copied without changing their contents.
+- The CI workflow in this snapshot runs Node.js 22 only and triggers for `main`/`master`; it does not match the supplied claim of a Node 20/22 matrix on `ifia/*`.
+- The README badge still says 9/9 tests, while the owner reports 17 tests.
+- The current authorization tests mainly exercise token/role logic and constructed records; they do not demonstrate end-to-end HTTP rejection of an anonymous approval request.
+- No clean dependency install or test/build command has been run against the imported copy yet.
+
+**Disposition: HOLD for deployment pending auth hardening and independent clean-build/test verification.** This section is a source review, not a claim that the reported 17 tests were reproduced here.
+
+
+### Independent verification attempt in this environment
+
+- A clean `npm ci` was attempted from the extracted source snapshot, but the package installation exceeded the available execution window and timed out.
+- `npm test` was then attempted, but dependency installation was incomplete and Node could not resolve `tsx`; all six test-file processes exited before executing their test assertions.
+- Therefore, this attempt provides **no pass/fail evidence about the application's test assertions**. A clean install and test/build run in GitHub Actions or a network-enabled Node environment is still required.
