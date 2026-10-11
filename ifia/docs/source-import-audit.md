@@ -157,3 +157,10 @@ Together, these permit an unauthenticated caller to obtain a token that maps to 
 - No clean dependency install or test/build command has been run against the imported copy yet.
 
 **Disposition: HOLD for deployment pending auth hardening and independent clean-build/test verification.** This section is a source review, not a claim that the reported 17 tests were reproduced here.
+
+
+### Independent verification attempt in this environment
+
+- A clean `npm ci` was attempted from the extracted source snapshot, but the package installation exceeded the available execution window and timed out.
+- `npm test` was then attempted, but dependency installation was incomplete and Node could not resolve `tsx`; all six test-file processes exited before executing their test assertions.
+- Therefore, this attempt provides **no pass/fail evidence about the application's test assertions**. A clean install and test/build run in GitHub Actions or a network-enabled Node environment is still required.
