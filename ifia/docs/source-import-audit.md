@@ -104,3 +104,31 @@ Import the reviewed source under `ifia/app/` only after excluding `.env`, `node_
 ## Audit disposition
 
 **Status: HOLD for deployment.** The current implementation may be useful as a local synthetic demonstration, but the unauthenticated approval and dispatch controls, misleading external-CMMS success behavior, and non-cryptographic audit encoding must be addressed before any production or plant-connected use.
+
+
+## Follow-up remediation status supplied by project owner
+
+**Source of this section:** the project owner supplied a remediation summary dated 2026-10-11. The summary reports changes and test results from a newer working copy. The updated source files and CI workflow were not included in the original ZIP reviewed above and have not yet been inspected or run independently in this environment. Therefore, the following is recorded as **owner-reported status**, not independently verified closure of the findings.
+
+| Finding | Owner-reported remediation | Owner-reported gate | Current independent status |
+|---|---|---|---|
+| IFIA-SEC-001 | Added server-side `auth.ts`, `authenticateUser`, `requireRole()`; reviewer identity from verified `req.user`; reject body overrides | `authorization.test.ts` Pass | Pending review of updated source and test execution |
+| IFIA-SEC-002 | Required authentication and role enforcement on CMMS dispatch; require verified approval; idempotency | `cmmsAdapter.test.ts` Pass | Pending review of updated source and test execution |
+| IFIA-SEC-003 | Strict CORS allowlists, defensive response headers, RBAC on mutating routes | `server/index.ts` Verified | Pending review of updated source and configuration |
+| IFIA-SEC-004 | Explicit `is_simulation: true`, simulation banner, fail-closed behavior when external connectors are unconfigured | `cmmsAdapter.test.ts` Pass | Pending review of updated source and test execution |
+| IFIA-SEC-005 | Chained SHA-256 digests using previous hash and canonical serialization; tamper detection and `/api/audit/verify` | `auditIntegrity.test.ts` Pass | Pending review of updated source and test execution |
+| IFIA-SEC-006 | Sanitization across evidence title, raw content, and source type; untrusted-evidence delimiters | `adversarialSecurity.test.ts` Pass | Pending review of updated source and test execution |
+
+### Owner-reported build/test results
+
+The project owner reports 17 tests passed, zero failed, zero cancelled; server TypeScript compilation passed; and the Vite client bundle built with 1,924 modules transformed and output sizes of 271 kB JavaScript / 45 kB CSS. These results have not yet been reproduced in this environment. The owner also reports a CI workflow at `.github/workflows/ci.yml` testing Node.js 20 and 22. That workflow has not yet been inspected in the repository.
+
+### Evidence needed to close the audit
+
+1. Export/upload the updated Antigravity project ZIP that contains the remediation code and tests, or push the updated code to a source branch.
+2. Confirm the updated files correspond to the paths in the remediation summary.
+3. Re-run the tests and builds from a clean install, without reusing the archived Windows `node_modules`.
+4. Inspect the authentication/token implementation, role policy, CORS configuration, audit canonicalization, and fail-closed CMMS mode directly.
+5. Review the CI workflow and obtain a successful run linked to the exact source commit.
+
+Until that evidence is available, keep the deployment disposition at **HOLD pending independent verification**. The reported remediations are encouraging, but they do not change the contents of the original archive or prove that the updated implementation is already committed to GitHub.
