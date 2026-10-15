@@ -1,0 +1,8 @@
+Criterion_ID,Requirement_Title,Target_Scope,Implementation_File,Test_Assertion_IDs,Verification_Status,Evidence_Summary
+MVP-AC-01,Project & Design Basis Setup,Configurable parameters with no hidden defaults,CANONICAL_DATA_SCHEMA.json,Tests 1-3,VERIFIED,ProjectDesignBasis defines explicit drop limits and system frequency
+MVP-AC-02,Traceable Data Ingestion,CSV parsing with IMPORTED_RAW provenance and duplicate tag check,src/ingestion/csv_parser.js,Tests 37-43,VERIFIED,Loads 6 items with TraceableValue; duplicate tag PUMP_01 rejected
+MVP-AC-03,Completeness Validation,Missing inputs return NOT_ASSESSED with missing fields list,src/deterministic_engine.js,Tests 33-34,VERIFIED,Incomplete feeder returns NOT_ASSESSED and lists cable_length_m
+MVP-AC-04,Bounded Deterministic Calculation,15 benchmarks matching hand math within <=0.05% tolerance,src/deterministic_engine.js,Tests 1-32,VERIFIED,75kW motor gives 10.67V (2.57%); 1600kVA transformer gives 34.13kA
+MVP-AC-05,Cross-Document Consistency Check,Detects orphan tags, Ib > In, In > Iz, VD exceedance, adiabatic fails,src/modules/assurance/consistency_checker.js,Tests 44-50,VERIFIED,Caught FND_001 (Ib>In), FND_002 (Adiabatic fail), FND_003 (Orphan)
+MVP-AC-06,Corrective Action & Closure Workflow,Critical safety findings pinned first in severity ranking,src/modules/assurance/consistency_checker.js,Test 51,VERIFIED,All CRITICAL_SAFETY findings sorted to top of register
+MVP-AC-07,Audit-Ready Report Generation,Printable watermarked report with equation proofs and open findings,src/reports/report_generator.js,Tests 52-56,VERIFIED,Generated sample_verification_report.html with PRELIMINARY watermark

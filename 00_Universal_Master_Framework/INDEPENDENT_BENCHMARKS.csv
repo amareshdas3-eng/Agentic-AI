@@ -1,0 +1,16 @@
+Benchmark_ID,Domain,Test_Case_Description,Key_Inputs,Physical_Equation,Expected_Value,Tolerance,Expected_Status
+BM-01,VOLTAGE_DROP,75kW Motor Feeder 3Ph 415V 120m,"P=75kW, V=415V, PF=0.85, eff=0.93, 95mm2 Al XLPE","V_drop = sqrt(3)*I*L*(R*cos+X*sin)/1000",10.67 V,+-0.15 V,PASS
+BM-02,VOLTAGE_DROP,110kW Heavy Pump 3Ph 415V 80m,"P=110kW, V=415V, PF=0.90, eff=0.94, 185mm2 Cu XLPE","V_drop = sqrt(3)*I*L*(R*cos+X*sin)/1000",3.66 V,+-0.10 V,PASS
+BM-03,VOLTAGE_DROP,37kW Long Run 3Ph 415V 200m Low PF,"P=37kW, V=415V, PF=0.75, eff=0.91, 50mm2 Cu XLPE","V_drop = sqrt(3)*I*L*(R*cos+X*sin)/1000",10.88 V,+-0.20 V,PASS
+BM-04,VOLTAGE_DROP,5kW Lighting Sub-Feeder 1Ph 230V 50m,"P=5kW, V=230V, PF=0.95, eff=1.0, 10mm2 Cu XLPE","V_drop = 2*I*L*(R*cos+X*sin)/1000",5.05 V,+-0.15 V,PASS
+BM-05,VOLTAGE_DROP,10kW UPS Outgoing 1Ph 230V 30m,"P=10kW, V=230V, PF=0.90, eff=0.98, 16mm2 Cu XLPE","V_drop = 2*I*L*(R*cos+X*sin)/1000",4.09 V,+-0.15 V,PASS
+BM-06,MOTOR_STARTING,75kW Motor Starting Inrush Dip,"FLC=132A, Ist=6x, PFst=0.30, L=120m, 95mm2 Al","V_dip = sqrt(3)*Ist*L*(R*cos_st+X*sin_st)/1000",7.76 %,+-0.25 %,PASS
+BM-07,MOTOR_STARTING,160kW Motor Starting Inrush Dip,"P=160kW, FLC=266.4A, Ist=5.5x, PFst=0.25, L=90m, 240mm2 Cu","V_dip = sqrt(3)*Ist*L*(R*cos_st+X*sin_st)/1000",5.21 %,+-0.25 %,PASS
+BM-08,TRANSFORMER,Transformer Capacity with Deratings,"Demand=1220kVA, Growth=15%, Tamb=45C, Alt=200m","S_calc = (Demand*(1+Growth))/k_temp",1600 kVA,Exact R10,PASS
+BM-09,TRANSFORMER,1600kVA Bolted Secondary Fault,"S=1600kVA, Vsec=433V, Z=6.25%","I_sc = S / (sqrt(3)*Vsec*(Z/100))",34.13 kA,+-0.50 kA,PASS
+BM-10,TRANSFORMER,2500kVA Bolted Secondary Fault,"S=2500kVA, Vsec=415V, Z=7.15%","I_sc = S / (sqrt(3)*Vsec*(Z/100))",48.64 kA,+-0.60 kA,PASS
+BM-11,ADIABATIC_FAULT,Cable Withstand Undersized Failure,"Area=95mm2, Isc=25kA, t=0.5s, Al XLPE (k=94)","S_min = (Isc * sqrt(t)) / k",188.06 mm2,+-0.50 mm2,FAIL
+BM-12,ADIABATIC_FAULT,Cable Withstand Adequate Pass,"Area=240mm2, Isc=25kA, t=0.5s, Al XLPE (k=94)","S_min = (Isc * sqrt(t)) / k",188.06 mm2,+-0.50 mm2,PASS
+BM-13,ADIABATIC_FAULT,Copper Cable Withstand Pass,"Area=50mm2, Isc=16kA, t=0.2s, Cu XLPE (k=143)","S_min = (Isc * sqrt(t)) / k",50.04 mm2,+-0.50 mm2,PASS
+BM-14,BUSBAR_FORCE,Peak Electrodynamic Force on Busbars,"Isc=50kA, a=0.10m, l=0.35m, X/R=8","F_m = 0.173 * (i_p)^2 * (l/a)",7320 N,+-200 N,PASS
+BM-15,EARTHING,Substation Tolerable Touch & Step,"50kg, t=0.5s, rho_s=3000 Ohm.m, rho_soil=100 Ohm.m","IEEE 80 Section 8.3 Cs & E_touch formulas",786.5 V,+-15 V,PASS

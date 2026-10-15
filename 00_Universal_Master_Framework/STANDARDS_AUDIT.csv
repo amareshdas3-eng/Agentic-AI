@@ -1,0 +1,16 @@
+Standard_ID,Issuer,Identifier,Edition_Status,Clause_Reference,Verified_Formula_or_Criterion,Governance_Status,Restriction_Note
+STD-001,IEC,IEC 60364-5-52,Ed 3.0 (2009)+AMD1:2011,Clause 525,"V_drop = sqrt(3)*I*L*(R*cos(phi)+X*sin(phi))/1000",VERIFIED,"Radial feeders only; meshed networks require numerical solver."
+STD-002,IEC,IEC 60364-5-54,Ed 3.0 (2011),Clause 543.1.2,"S_min = (I_sc * sqrt(t)) / k",VERIFIED,"Adiabatic assumption valid for fault durations t <= 5.0 seconds."
+STD-003,IEC,IEC 60076-1,Ed 3.0 (2011),Clause 4 / Table 1,Standard R10 series kVA ratings,VERIFIED,Derating required for ambient > 40°C and altitude > 1000m.
+STD-004,IEC,IEC 60076-5,Ed 3.0 (2006),Table 1,Standard %Z impedance ranges by kVA,VERIFIED,Tolerance on impedance (+-10% or +-7.5%) must be checked.
+STD-005,IEC,IEC 60947-2,Ed 5.0 (2016)+AMD1:2019,Clause 4.3.5 / 4.3.6,I_cu >= I_sc and I_cs >= gamma*I_cu,VERIFIED,"Category B required for selective time-delayed breakers."
+STD-006,IEC,IEC 61439-1,Ed 3.0 (2020),Clause 8.6 / Table 6,Busbar temperature rise limits (Delta T <= 50K bare Cu),VERIFIED,"Current density is secondary check; thermal equilibrium is primary."
+STD-007,IEC,IEC 61439-2,Ed 3.0 (2020),Clause 8.101,Forms of Internal Separation (Form 1 to 4b),VERIFIED,Form 4b recommended for critical continuous process plants.
+STD-008,IEC,IEC 60865-1,Ed 3.0 (2011),Clause 5,"F_m = 0.173 * (i_p)^2 * (l / a)",VERIFIED,"Peak factor kappa calculated per IEC 60909 X/R ratio."
+STD-009,IEC,IEC 62271-102,Ed 2.0 (2018),Clause 5.104,Interlock: ES closed iff DS open and CB open,VERIFIED,Mandatory mechanical and electrical interlocking enforced.
+STD-010,IEEE,IEEE Std 141,Rev 1993,Section 3.8,Motor starting transient voltage dip <= 15%,VERIFIED,Assumes typical 6.0x FLC at 0.30 PF lagging for DOL start.
+STD-011,IEEE,IEEE Std 80,Rev 2013,Section 8.3,E_touch and E_step tolerable thresholds,VERIFIED,Requires surface rock resistivity rho_s and fault clearing time t_s.
+STD-012,IEEE,IEEE Std 1584,Rev 2018,Section 4,Arc-flash incident energy model,NEEDS_AUTHORISED_SOURCE,"MVP marks arc flash as REVIEW_REQUIRED screening estimate only."
+STD-013,BIS,IS 732,Rev 2019,Clause 5.2,Wiring installation design criteria,VERIFIED,Indian National Building Code electrical requirements aligned.
+STD-014,BIS,IS 3043,Rev 2018,Clause 15.3,Earthing code of practice,VERIFIED,"Touch and step calculations match IEEE 80 formulation."
+STD-015,CEA,CEA Safety Regs,2023 Gazette,Reg 35/43/44,Substation earthing and interlocking mandates,VERIFIED,Statutory Indian inspection requirements enforced.
