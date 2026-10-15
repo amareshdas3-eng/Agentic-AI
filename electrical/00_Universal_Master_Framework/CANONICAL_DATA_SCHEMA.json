@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProEngineeringCanonicalPowerSystemSchema_v2",
+  "description": "Universal canonical electrical data schema v2.0 enforcing provenance, multi-tenancy, non-hardcoded design criteria, and deterministic evaluation states.",
+  "type": "object",
+  "required": ["project_id", "organisation_id", "project_name", "project_revision", "lifecycle_status", "design_basis", "equipment", "findings"],
+  "definitions": {
+    "ValueProvenance": {
+      "type": "string",
+      "enum": ["USER_ENTERED", "IMPORTED_RAW", "ENGINEER_CONFIRMED", "PROJECT_DEFAULT", "CALCULATED_DETERMINISTIC", "AI_HYPOTHESIS"]
+    },
+    "EvaluationStatus": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "NOT_ASSESSED", "REVIEW_REQUIRED"]
+    },
+    "TraceableNumber": {
+      "type": "object",
+      "required": ["value", "unit", "provenance"],
+      "properties": {
+        "value": { "type": "number" },
+        "unit": { "type": "string" },
+        "provenance": { "$ref": "#/definitions/ValueProvenance" },
+        "source_document_id": { "type": "string" },
+        "source_location": { "type": "string" },
+        "confirmed_by_user_id": { "type": "string" },
+        "confirmed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "TraceableString": {
+      "type": "object",
+      "required": ["value", "unit", "provenance"],
+      "properties": {
+        "value": { "type": "string" },
+        "unit": { "type": "string" },
+        "provenance": { "$ref": "#/definitions/ValueProvenance" },
+        "source_document_id": { "type": "string" },
+        "source_location": { "type": "string" },
+        "confirmed_by_user_id": { "type": "string" },
+        "confirmed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "TraceableBoolean": {
+      "type": "object",
+      "required": ["value", "unit", "provenance"],
+      "properties": {
+        "value": { "type": "boolean" },
+        "unit": { "type": "string" },
+        "provenance": { "$ref": "#/definitions/ValueProvenance" },
+        "source_document_id": { "type": "string" },
+        "source_location": { "type": "string" },
+        "confirmed_by_user_id": { "type": "string" },
+        "confirmed_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "properties": {
+    "project_id": { "type": "string" },
+    "organisation_id": { "type": "string", "description": "Strict multi-tenant isolation key" },
+    "project_name": { "type": "string" },
+    "jurisdiction": { "type": "string", "default": "GLOBAL_IEC" },
+    "project_revision": { "type": "string", "default": "v1.0" },
+    "lifecycle_status": {
+      "type": "string",
+      "enum": ["DRAFT", "PRELIMINARY_NOT_FOR_CONSTRUCTION", "UNDER_REVIEW", "APPROVED_FOR_PILOT", "SUPERSEDED"],
+      "default": "DRAFT"
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "design_basis": {
+      "type": "object",
+      "required": ["design_basis_id", "revision", "system_frequency_hz", "voltage_drop_limits_pct", "ambient_temperature_c"],
+      "properties": {
+        "design_basis_id": { "type": "string" },
+        "revision": { "type": "string", "default": "v1.0" },
+        "system_frequency_hz": { "$ref": "#/definitions/TraceableNumber" },
+        "voltage_levels_v": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "voltage_drop_limits_pct": {
+          "type": "object",
+          "required": ["main_feeder_steady_state", "motor_feeder_steady_state", "motor_starting_bus_dip"],
+          "properties": {
+            "main_feeder_steady_state": { "$ref": "#/definitions/TraceableNumber" },
+            "motor_feeder_steady_state": { "$ref": "#/definitions/TraceableNumber" },
+            "motor_starting_bus_dip": { "$ref": "#/definitions/TraceableNumber" },
+            "lighting_circuit": { "$ref": "#/definitions/TraceableNumber" }
+          }
+        },
+        "spare_feeder_philosophy_pct": { "$ref": "#/definitions/TraceableNumber" },
+        "transformer_growth_margin_pct": { "$ref": "#/definitions/TraceableNumber" },
+        "ambient_temperature_c": { "$ref": "#/definitions/TraceableNumber" },
+        "ground_temperature_c": { "$ref": "#/definitions/TraceableNumber" },
+        "altitude_m": { "$ref": "#/definitions/TraceableNumber" },
+        "target_earth_grid_resistance_ohm": { "$ref": "#/definitions/TraceableNumber" },
+        "applicable_standards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["standard_reference_id", "issuer", "identifier", "edition_status"],
+            "properties": {
+              "standard_reference_id": { "type": "string" },
+              "issuer": { "type": "string", "enum": ["IEC", "IEEE", "BIS", "BSI", "NFPA", "CEA", "CLIENT_SPEC", "OTHER"] },
+              "identifier": { "type": "string" },
+              "edition_status": { "type": "string" },
+              "clause_reference": { "type": "string" },
+              "jurisdiction_scope": { "type": "string" },
+              "verification_status": { "type": "string", "enum": ["VERIFIED", "NEEDS_AUTHORISED_SOURCE", "CONFLICTED", "NOT_APPLICABLE"] },
+              "licence_note": { "type": "string", "default": "Metadata and clause pointers only; no copyrighted text stored." }
+            }
+          }
+        }
+      }
+    },
+    "equipment": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["equipment_id", "tag", "equipment_type", "system_voltage_v", "phase_config"],
+        "properties": {
+          "equipment_id": { "type": "string" },
+          "tag": { "type": "string" },
+          "description": { "type": "string" },
+          "equipment_type": {
+            "type": "string",
+            "enum": ["SOURCE", "BUS", "TRANSFORMER", "SWITCHGEAR_BREAKER", "CABLE", "MOTOR_LOAD", "STATIC_LOAD", "MCC_PANEL", "EARTHING_SYSTEM"]
+          },
+          "system_voltage_v": { "$ref": "#/definitions/TraceableNumber" },
+          "phase_config": { "type": "string", "enum": ["3PH_3W", "3PH_4W", "1PH_2W", "DC"] },
+          "upstream_node_id": { "type": "string" },
+          "downstream_node_id": { "type": "string" },
+          "ratings": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                { "$ref": "#/definitions/TraceableNumber" },
+                { "$ref": "#/definitions/TraceableString" },
+                { "$ref": "#/definitions/TraceableBoolean" }
+              ]
+            }
+          },
+          "evaluation_status": { "$ref": "#/definitions/EvaluationStatus" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["finding_id", "rule_id", "severity", "rationale", "status"],
+        "properties": {
+          "finding_id": { "type": "string" },
+          "rule_id": { "type": "string" },
+          "rule_description": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["CRITICAL_SAFETY", "MAJOR_ENGINEERING", "MINOR_DISCREPANCY", "INFO_MISSING_DATA"]
+          },
+          "source_records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["document_id", "record_id", "field_name", "compared_value", "unit"],
+              "properties": {
+                "document_id": { "type": "string" },
+                "document_revision": { "type": "string" },
+                "record_id": { "type": "string" },
+                "field_name": { "type": "string" },
+                "compared_value": { "type": ["string", "number"] },
+                "unit": { "type": "string" }
+              }
+            }
+          },
+          "rationale": { "type": "string" },
+          "missing_data_or_uncertainty": { "type": "string" },
+          "recommended_remediation": { "type": "string" },
+          "status": { "type": "string", "enum": ["OPEN", "EXCEPTION_PROPOSED", "CLOSED_VERIFIED"] },
+          "responsible_owner": { "type": "string" },
+          "closure_evidence_id": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "closed_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}
