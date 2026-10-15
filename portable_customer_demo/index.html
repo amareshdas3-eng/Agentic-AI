@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProEngineering Power Systems Suite — Interactive Test Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --pass: #10b981;
+      --pass-bg: rgba(16, 185, 129, 0.12);
+      --warn: #f59e0b;
+      --fail: #ef4444;
+      --fail-bg: rgba(239, 68, 68, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      padding: 30px 20px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 24px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .header-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    .status-pill {
+      background: var(--pass-bg);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--pass);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #04101d;
+      border-color: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media(max-width: 900px) { .tab-content.active { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      background: #090e18;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .btn-calc {
+      width: 100%;
+      background: var(--accent);
+      color: #04101d;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: opacity 0.2s;
+    }
+    .btn-calc:hover { opacity: 0.9; }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .metric-box {
+      background: #090e18;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .metric-val {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+    .metric-unit {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .badge-pass {
+      display: inline-block;
+      background: var(--pass-bg);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--pass);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-fail {
+      display: inline-block;
+      background: var(--fail-bg);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--fail);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .math-proof {
+      background: #060910;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    .standard-tag {
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .badge-critical {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      color: #f87171;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .badge-major {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.6);
+      color: #fbbf24;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .assurance-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 12px;
+    }
+    .assurance-table th, .assurance-table td {
+      border: 1px solid var(--card-border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .assurance-table th {
+      background: #090e18;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .assurance-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .btn-report {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-report:hover { background: #0369a1; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div>
+        <div class="logo-badge">⚡ ProEngineering Industrial Power Systems</div>
+        <h1>Deterministic Engineering Verification Lab</h1>
+        <p class="header-desc">Dual-Solver Electrical Calculation & Statutory Compliance Engine (IEC / IEEE / IS / NEC)</p>
+      </div>
+      <div class="status-pill">
+        <span>●</span> Engine Status: Verified Deterministic
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-vd')">01. Voltage Drop & Inrush</button>
+      <button class="tab-btn" onclick="switchTab('tab-tr')">02. Transformer Sizing & Faults</button>
+      <button class="tab-btn" onclick="switchTab('tab-cable')">03. Adiabatic Short-Circuit Withstand</button>
+      <button class="tab-btn" onclick="switchTab('tab-touch')">04. Substation Touch & Step</button>
+      <button class="tab-btn" onclick="switchTab('tab-assurance')">05. Design Assurance Audit</button>
+    </div>
+
+    <!-- TAB 1: VOLTAGE DROP & INRUSH -->
+    <div id="tab-vd" class="tab-content active">
+      <div class="card">
+        <div class="card-title">
+          <span>Feeder Design Inputs</span>
+          <span class="standard-tag">IEC 60364-5-52 / IS 732</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Load Power (kW)</label>
+            <input type="number" id="vd_power" value="75" step="1">
+          </div>
+          <div class="form-group">
+            <label>Voltage (V Line-Line)</label>
+            <input type="number" id="vd_voltage" value="415">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Power Factor (cos φ)</label>
+            <input type="number" id="vd_pf" value="0.85" step="0.01" min="0.5" max="1.0">
+          </div>
+          <div class="form-group">
+            <label>Motor Efficiency (η)</label>
+            <input type="number" id="vd_eff" value="0.93" step="0.01" min="0.5" max="0.99">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Route Length (Meters)</label>
+            <input type="number" id="vd_length" value="120">
+          </div>
+          <div class="form-group">
+            <label>Conductor Material</label>
+            <select id="vd_mat">
+              <option value="ALUMINIUM" selected>Aluminium (Al)</option>
+              <option value="COPPER">Copper (Cu)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conductor Size (mm²)</label>
+            <select id="vd_size">
+              <option value="35">35 mm²</option>
+              <option value="50">50 mm²</option>
+              <option value="70">70 mm²</option>
+              <option value="95" selected>95 mm²</option>
+              <option value="120">120 mm²</option>
+              <option value="150">150 mm²</option>
+              <option value="185">185 mm²</option>
+              <option value="240">240 mm²</option>
+              <option value="300">300 mm²</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Insulation Base</label>
+            <select id="vd_ins">
+              <option value="XLPE" selected>XLPE (90°C Operating)</option>
+              <option value="PVC">PVC (70°C Operating)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-calc" onclick="calculateVoltageDropLab()">Run Deterministic Verification</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Calculation Results & Proof</span>
+          <span id="vd_badge" class="badge-pass">PASS</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-label">Design Current (I_b)</div>
+            <div class="metric-val" id="res_ib">132.02 <span class="metric-unit">A</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Running Voltage Drop</div>
+            <div class="metric-val" id="res_vdrop">2.57 <span class="metric-unit">%</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Voltage Drop in Volts</div>
+            <div class="metric-val" id="res_volts">10.67 <span class="metric-unit">V</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Motor Starting Dip (6x)</div>
+            <div class="metric-val" id="res_dip">7.76 <span class="metric-unit">%</span></div>
+          </div>
+        </div>
+        <div class="math-proof" id="vd_proof">
+Running mathematical proof engine...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: TRANSFORMER SIZING -->
+    <div id="tab-tr" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Substation Load & Ambient Inputs</span>
+          <span class="standard-tag">IEC 60076 / IS 2026</span>
+        </div>
+        <div class="form-group">
+          <label>Diversified Peak Demand (kVA)</label>
+          <input type="number" id="tr_demand" value="1220">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Future Growth Margin (%)</label>
+            <input type="number" id="tr_growth" value="15">
+          </div>
+          <div class="form-group">
+            <label>Peak Ambient Temp (°C)</label>
+            <input type="number" id="tr_amb" value="45">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Primary Voltage (V)</label>
+            <input type="number" id="tr_vpri" value="11000">
+          </div>
+          <div class="form-group">
+            <label>Secondary Voltage (V)</label>
+            <input type="number" id="tr_vsec" value="433">
+          </div>
+        </div>
+        <button class="btn-calc" onclick="calculateTransformerLab()">Size Transformer & Compute Faults</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Selection & Fault Duty</span>
+          <span class="badge-pass">OPTIMAL RATING</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-label">Selected Standard Rating</div>
+            <div class="metric-val" id="res_tr_kva">1600 <span class="metric-unit">kVA</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Rated Secondary Current</div>
+            <div class="metric-val" id="res_tr_isec">2133 <span class="metric-unit">A</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Standard % Impedance (%Z)</div>
+            <div class="metric-val" id="res_tr_z">6.25 <span class="metric-unit">%</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Bolted Secondary Fault</div>
+            <div class="metric-val" id="res_tr_fault">34.13 <span class="metric-unit">kA</span></div>
+          </div>
+        </div>
+        <div class="math-proof" id="tr_proof">
+Transformer sizing calculations will appear here...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ADIABATIC CABLE WITHSTAND -->
+    <div id="tab-cable" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Short-Circuit Thermal Duty</span>
+          <span class="standard-tag">IEC 60364-5-54 / IS 732</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prospective Fault Current (kA RMS)</label>
+            <input type="number" id="sc_fault" value="25.0" step="0.5">
+          </div>
+          <div class="form-group">
+            <label>Fault Clearing Time (Seconds)</label>
+            <input type="number" id="sc_time" value="0.5" step="0.1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conductor Metallurgy</label>
+            <select id="sc_mat">
+              <option value="ALUMINIUM" selected>Aluminium (k=94 for XLPE)</option>
+              <option value="COPPER">Copper (k=143 for XLPE)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Candidate Conductor Area (mm²)</label>
+            <input type="number" id="sc_area" value="95">
+          </div>
+        </div>
+        <button class="btn-calc" onclick="calculateAdiabaticLab()">Verify Fault Thermal Withstand</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Adiabatic Withstand Proof</span>
+          <span id="sc_badge" class="badge-fail">FAIL (UNDERSIZED)</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-label">Minimum Required Area (S_min)</div>
+            <div class="metric-val" id="res_sc_smin">188.06 <span class="metric-unit">mm²</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Selected Conductor Area</div>
+            <div class="metric-val" id="res_sc_sactual">95.0 <span class="metric-unit">mm²</span></div>
+          </div>
+        </div>
+        <div class="math-proof" id="sc_proof">
+Adiabatic verification proof...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: SUBSTATION TOUCH & STEP -->
+    <div id="tab-touch" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Substation Grounding Parameters</span>
+          <span class="standard-tag">IEEE Std 80:2013 / IS 3043</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fault Duration (Seconds)</label>
+            <input type="number" id="g_time" value="0.5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>Body Weight Standard</label>
+            <select id="g_weight">
+              <option value="50" selected>50 kg (Conservative)</option>
+              <option value="70">70 kg</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Crushed Rock Surface (Ω·m)</label>
+            <input type="number" id="g_surfrho" value="3000">
+          </div>
+          <div class="form-group">
+            <label>Crushed Rock Layer (Meters)</label>
+            <input type="number" id="g_surfthick" value="0.10" step="0.02">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Native Soil Resistivity (Ω·m)</label>
+          <input type="number" id="g_soilrho" value="100">
+        </div>
+        <button class="btn-calc" onclick="calculateGroundingLab()">Compute Safe Potentials</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Statutory Safety Limits</span>
+          <span class="badge-pass">SAFE LIMITS</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-label">Tolerable Touch Voltage</div>
+            <div class="metric-val" id="res_g_touch">786.5 <span class="metric-unit">V</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Tolerable Step Voltage</div>
+            <div class="metric-val" id="res_g_step">2675.2 <span class="metric-unit">V</span></div>
+          </div>
+        </div>
+        <div class="math-proof" id="g_proof">
+Substation safety potential derivations...
+        </div>
+    <!-- TAB 5: DESIGN ASSURANCE & DISCREPANCY MATRIX -->
+    <div id="tab-assurance" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Cross-Document Consistency Audit</span>
+          <span class="standard-tag">IEC 60364-4-43 / IEC 60947</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Deterministic audit across Ingested Load Schedule (6 records) and Cable Schedule (6 feeders). Evaluates equipment tag consistency, continuous current coordination (I_b ≤ I_n ≤ I_z'), steady-state voltage drop, and adiabatic fault withstand.
+        </p>
+
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-label">Equipment Evaluated</div>
+            <div class="metric-val">6 <span class="metric-unit">Items</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Feeders Evaluated</div>
+            <div class="metric-val">6 <span class="metric-unit">Feeders</span></div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Audit Verdict</div>
+            <div class="metric-val" style="color: #f87171; font-size: 15px;">CRITICAL DEFECTS</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Critical Safety Findings</div>
+            <div class="metric-val" style="color: #f87171;">2 <span class="metric-unit">Pinned</span></div>
+          </div>
+        </div>
+
+        <button class="btn-calc" onclick="runAssuranceLab()">Re-Run Multi-Module Consistency Audit</button>
+        <button class="btn-report" onclick="openVerificationReport()" style="margin-top: 12px; width: 100%; justify-content: center;">
+          📄 Open Watermarked Engineering Report (PDF/Print)
+        </button>
+      </div>
+
+      <div class="card" style="grid-column: span 1;">
+        <div class="card-title">
+          <span>Safety Findings & Discrepancy Register</span>
+          <span id="assurance_badge" class="badge-critical">2 CRITICAL FINDINGS</span>
+        </div>
+        
+        <div style="overflow-x: auto;">
+          <table class="assurance-table">
+            <thead>
+              <tr>
+                <th>Finding ID</th>
+                <th>Severity</th>
+                <th>Rule ID</th>
+                <th>Compared Values</th>
+                <th>Engineering Rationale</th>
+              </tr>
+            </thead>
+            <tbody id="assurance_table_body">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Cable Data Lookup
+    const CABLES = {
+      ALUMINIUM: {
+        35: { r20: 0.868, xl: 0.081 },
+        50: { r20: 0.641, xl: 0.082 },
+        70: { r20: 0.443, xl: 0.077 },
+        95: { r20: 0.320, xl: 0.076 },
+        120: { r20: 0.253, xl: 0.075 },
+        150: { r20: 0.206, xl: 0.074 },
+        185: { r20: 0.164, xl: 0.074 },
+        240: { r20: 0.125, xl: 0.073 },
+        300: { r20: 0.100, xl: 0.072 }
+      },
+      COPPER: {
+        35: { r20: 0.524, xl: 0.081 },
+        50: { r20: 0.387, xl: 0.080 },
+        70: { r20: 0.268, xl: 0.077 },
+        95: { r20: 0.193, xl: 0.076 },
+        120: { r20: 0.153, xl: 0.075 },
+        150: { r20: 0.124, xl: 0.074 },
+        185: { r20: 0.0991, xl: 0.074 },
+        240: { r20: 0.0754, xl: 0.073 },
+        300: { r20: 0.0601, xl: 0.072 }
+      }
+    };
+
+    // 1. Voltage Drop Lab
+    function calculateVoltageDropLab() {
+      const p = parseFloat(document.getElementById('vd_power').value);
+      const v = parseFloat(document.getElementById('vd_voltage').value);
+      const pf = parseFloat(document.getElementById('vd_pf').value);
+      const eff = parseFloat(document.getElementById('vd_eff').value);
+      const l = parseFloat(document.getElementById('vd_length').value);
+      const mat = document.getElementById('vd_mat').value;
+      const size = parseInt(document.getElementById('vd_size').value);
+      const ins = document.getElementById('vd_ins').value;
+
+      const ib = (p * 1000) / (Math.sqrt(3) * v * pf * eff);
+      const alpha = mat === 'COPPER' ? 0.00393 : 0.00403;
+      const temp = ins === 'XLPE' ? 90 : 70;
+      const cData = CABLES[mat][size];
+      const rTheta = cData.r20 * (1 + alpha * (temp - 20));
+      const xl = cData.xl;
+      const sinPhi = Math.sqrt(1 - Math.pow(pf, 2));
+
+      const zEff = rTheta * pf + xl * sinPhi;
+      const vDrop = (Math.sqrt(3) * ib * l * zEff) / 1000;
+      const vDropPct = (vDrop / v) * 100;
+
+      // Starting Dip (6x)
+      const iStart = ib * 6.0;
+      const sinPhiSt = Math.sqrt(1 - Math.pow(0.30, 2));
+      const zStart = rTheta * 0.30 + xl * sinPhiSt;
+      const vDip = (Math.sqrt(3) * iStart * l * zStart) / 1000;
+      const vDipPct = (vDip / v) * 100;
+
+      document.getElementById('res_ib').innerHTML = ib.toFixed(2) + ' <span class="metric-unit">A</span>';
+      document.getElementById('res_vdrop').innerHTML = vDropPct.toFixed(2) + ' <span class="metric-unit">%</span>';
+      document.getElementById('res_volts').innerHTML = vDrop.toFixed(2) + ' <span class="metric-unit">V</span>';
+      document.getElementById('res_dip').innerHTML = vDipPct.toFixed(2) + ' <span class="metric-unit">%</span>';
+
+      const badge = document.getElementById('vd_badge');
+      if (vDropPct <= 3.0) {
+        badge.className = 'badge-pass';
+        badge.innerText = 'PASS (<= 3.0%)';
+      } else {
+        badge.className = 'badge-fail';
+        badge.innerText = 'VIOLATION (> 3.0%)';
+      }
+
+      document.getElementById('vd_proof').innerText = 
+`[STEP 1: DESIGN CURRENT (I_b)]
+I_b = ${p} kW / (√3 × ${v} V × ${pf} × ${eff}) = ${ib.toFixed(2)} A
+
+[STEP 2: OPERATING RESISTANCE (R_${temp}°C)]
+R_operating = ${cData.r20.toFixed(4)} × [1 + ${alpha} × (${temp} - 20)] = ${rTheta.toFixed(4)} Ω/km
+X_L = ${xl.toFixed(4)} Ω/km
+Z_eff = (${rTheta.toFixed(4)} × ${pf}) + (${xl.toFixed(4)} × ${sinPhi.toFixed(4)}) = ${zEff.toFixed(4)} Ω/km
+
+[STEP 3: VOLTAGE DROP]
+ΔV = [√3 × ${ib.toFixed(2)} A × ${l} m × ${zEff.toFixed(4)} Ω/km] / 1000 = ${vDrop.toFixed(2)} V
+%ΔV = (${vDrop.toFixed(2)} / ${v}) × 100% = ${vDropPct.toFixed(2)}%
+
+[STEP 4: MOTOR STARTING INRUSH DIP (IEEE 141)]
+I_start = 6.0 × ${ib.toFixed(2)} A = ${iStart.toFixed(2)} A (cos φ = 0.30)
+%ΔV_start = ${vDipPct.toFixed(2)}% (Statutory Limit: <= 15.0%) -> ${vDipPct <= 15.0 ? 'PASS' : 'FAIL'}`;
+    }
+
+    // 2. Transformer Lab
+    function calculateTransformerLab() {
+      const demand = parseFloat(document.getElementById('tr_demand').value);
+      const growth = parseFloat(document.getElementById('tr_growth').value) / 100;
+      const amb = parseFloat(document.getElementById('tr_amb').value);
+      const vsec = parseFloat(document.getElementById('tr_vsec').value);
+
+      const kTemp = amb > 40 ? 1.0 - (amb - 40) * 0.01 : 1.0;
+      const reqKva = (demand * (1 + growth)) / kTemp;
+
+      const stdSeries = [100, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000];
+      const selected = stdSeries.find(k => k >= reqKva) || 5000;
+      const zPct = selected >= 1251 ? 6.25 : (selected >= 631 ? 5.0 : 4.5);
+      const isec = (selected * 1000) / (Math.sqrt(3) * vsec);
+      const faultKa = (isec / (zPct / 100)) / 1000;
+
+      document.getElementById('res_tr_kva').innerHTML = selected + ' <span class="metric-unit">kVA</span>';
+      document.getElementById('res_tr_isec').innerHTML = isec.toFixed(1) + ' <span class="metric-unit">A</span>';
+      document.getElementById('res_tr_z').innerHTML = zPct.toFixed(2) + ' <span class="metric-unit">%</span>';
+      document.getElementById('res_tr_fault').innerHTML = faultKa.toFixed(2) + ' <span class="metric-unit">kA</span>';
+
+      document.getElementById('tr_proof').innerText = 
+`[STEP 1: CAPACITY WITH AMBIENT DERATING]
+k_temp = 1.0 - (${amb}°C - 40°C) × 0.01 = ${kTemp.toFixed(2)}
+S_calculated = (${demand} kVA × ${1 + growth}) / ${kTemp.toFixed(2)} = ${reqKva.toFixed(1)} kVA
+Selected Standard Rating: ${selected} kVA (IEC 60076-1)
+
+[STEP 2: FULL LOAD CURRENT & BOLTED FAULT]
+I_sec = (${selected} kVA × 1000) / (√3 × ${vsec} V) = ${isec.toFixed(2)} A
+Standard Impedance %Z = ${zPct}% (IEC 60076-5)
+I_sc_secondary = ${isec.toFixed(2)} A / ${zPct/100} = ${faultKa.toFixed(2)} kA
+Recommended Switchgear Breaking Capacity (Icu): ${faultKa <= 35 ? '50 kA RMS' : '65 kA RMS'}`;
+    }
+
+    // 3. Adiabatic Lab
+    function calculateAdiabaticLab() {
+      const fault = parseFloat(document.getElementById('sc_fault').value);
+      const t = parseFloat(document.getElementById('sc_time').value);
+      const mat = document.getElementById('sc_mat').value;
+      const actualArea = parseFloat(document.getElementById('sc_area').value);
+      const k = mat === 'COPPER' ? 143 : 94;
+
+      const sMin = (fault * 1000 * Math.sqrt(t)) / k;
+      const isPass = actualArea >= sMin;
+
+      document.getElementById('res_sc_smin').innerHTML = sMin.toFixed(2) + ' <span class="metric-unit">mm²</span>';
+      document.getElementById('res_sc_sactual').innerHTML = actualArea.toFixed(1) + ' <span class="metric-unit">mm²</span>';
+
+      const badge = document.getElementById('sc_badge');
+      if (isPass) {
+        badge.className = 'badge-pass';
+        badge.innerText = 'PASS (WITHSTAND OK)';
+      } else {
+        badge.className = 'badge-fail';
+        badge.innerText = 'FAIL (UNDERSIZED)';
+      }
+
+      document.getElementById('sc_proof').innerText = 
+`[ADIABATIC SHORT-CIRCUIT THERMAL WITHSTAND (IEC 60364-5-54)]
+Formula: S_min = [I_sc × √t] / k
+Where:
+- I_sc = ${fault} kA = ${fault * 1000} A
+- Clearing time (t) = ${t} s
+- Material Constant (k) = ${k} (${mat} XLPE: 90°C to 250°C)
+
+S_min = [${fault * 1000} × √${t}] / ${k} = ${sMin.toFixed(2)} mm²
+Selected Conductor Area = ${actualArea} mm²
+Verification Result: ${actualArea} mm² ${isPass ? '>=' : '<'} ${sMin.toFixed(2)} mm² -> ${isPass ? 'COMPLIANT' : 'VIOLATION — FIRE / MELTING HAZARD'}`;
+    }
+
+    // 4. Grounding Lab
+    function calculateGroundingLab() {
+      const t = parseFloat(document.getElementById('g_time').value);
+      const kg = parseInt(document.getElementById('g_weight').value);
+      const rhoS = parseFloat(document.getElementById('g_surfrho').value);
+      const hs = parseFloat(document.getElementById('g_surfthick').value);
+      const rhoSoil = parseFloat(document.getElementById('g_soilrho').value);
+
+      const cs = 1 - (0.09 * (1 - (rhoSoil / rhoS))) / (2 * hs + 0.09);
+      const kWeight = kg === 50 ? 0.116 : 0.157;
+      const sqrtT = Math.sqrt(t);
+
+      const eTouch = ((1000 + 1.5 * cs * rhoS) * kWeight) / sqrtT;
+      const eStep = ((1000 + 6.0 * cs * rhoS) * kWeight) / sqrtT;
+
+      document.getElementById('res_g_touch').innerHTML = eTouch.toFixed(1) + ' <span class="metric-unit">V</span>';
+      document.getElementById('res_g_step').innerHTML = eStep.toFixed(1) + ' <span class="metric-unit">V</span>';
+
+      document.getElementById('g_proof').innerText = 
+`[SUBSTATION TOUCH & STEP VOLTAGE DERIVATION (IEEE Std 80:2013 / IS 3043:2018)]
+Body Weight Standard: ${kg} kg (Fibrillation Constant k = ${kWeight})
+Surface Layer Derating (C_s) = ${cs.toFixed(4)}
+
+E_touch_tolerable = [(1000 + 1.5 × C_s × ρ_s) × ${kWeight}] / √${t}
+                  = [(1000 + 1.5 × ${cs.toFixed(4)} × ${rhoS}) × ${kWeight}] / ${sqrtT.toFixed(4)}
+                  = ${eTouch.toFixed(1)} Volts
+
+E_step_tolerable  = [(1000 + 6.0 × C_s × ρ_s) × ${kWeight}] / √${t}
+                  = [(1000 + 6.0 × ${cs.toFixed(4)} × ${rhoS}) × ${kWeight}] / ${sqrtT.toFixed(4)}
+                  = ${eStep.toFixed(1)} Volts`;
+    }
+
+    // 5. Design Assurance & Discrepancy Matrix Lab
+    const SAMPLE_FINDINGS = [
+      {
+        id: 'FND_001',
+        severity: 'CRITICAL_SAFETY',
+        rule: 'ASSURANCE_002_BREAKER_UNDERSIZED',
+        source: 'Load: MILL_01 [I_b: 333.1 A] vs Breaker [I_n: 315 A]',
+        rationale: 'Continuous load current exceeds breaker rating. Nuisance tripping under continuous plant operation (IEC 60364-4-43).'
+      },
+      {
+        id: 'FND_002',
+        severity: 'CRITICAL_SAFETY',
+        rule: 'ASSURANCE_006_ADIABATIC_WITHSTAND_FAIL',
+        source: 'Feeder: FDR_FAN_01 [Size: 16 mm² Al] vs S_min [118.9 mm²]',
+        rationale: 'Conductor thermal withstand exceeded for 25 kA / 0.2 s fault. Explosive vaporisation hazard (IEC 60364-5-54).'
+      },
+      {
+        id: 'FND_003',
+        severity: 'MAJOR_ENGINEERING',
+        rule: 'ASSURANCE_001_TAG_ORPHAN',
+        source: 'Feeder: FDR_ORPHAN -> Target: COMPRESSOR_99',
+        rationale: 'Feeder tag references an equipment item not defined in the plant Load Schedule.'
+      },
+      {
+        id: 'FND_004',
+        severity: 'MAJOR_ENGINEERING',
+        rule: 'ASSURANCE_004_VOLTAGE_DROP_EXCEEDED',
+        source: 'Feeder: FDR_MILL_01 [ΔV: 4.82%] vs Design Basis [Limit: 3.0%]',
+        rationale: 'Calculated steady-state drop (20.0 V / 4.82%) violates 3.0% terminal voltage criterion.'
+      }
+    ];
+
+    function runAssuranceLab() {
+      const tbody = document.getElementById('assurance_table_body');
+      tbody.innerHTML = '';
+
+      SAMPLE_FINDINGS.forEach(f => {
+        const tr = document.createElement('tr');
+        const badgeClass = f.severity === 'CRITICAL_SAFETY' ? 'badge-critical' : 'badge-major';
+        tr.innerHTML = `
+          <td><strong>${f.id}</strong></td>
+          <td><span class="${badgeClass}">${f.severity.replace('_', ' ')}</span></td>
+          <td><code style="color:#38bdf8; font-size:11px;">${f.rule}</code></td>
+          <td style="font-size:11px; color:#cbd5e1;">${f.source}</td>
+          <td style="font-size:11px;">${f.rationale}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openVerificationReport() {
+      window.open('sample_verification_report.html', '_blank');
+    }
+
+    // Initial Trigger
+    calculateVoltageDropLab();
+    calculateTransformerLab();
+    calculateAdiabaticLab();
+    calculateGroundingLab();
+    runAssuranceLab();
+  </script>
+</body>
+</html>
+
