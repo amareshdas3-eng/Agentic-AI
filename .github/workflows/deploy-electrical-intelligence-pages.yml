@@ -1,0 +1,47 @@
+name: Deploy ProEngineering Electrical Intelligence Preview
+
+on:
+  push:
+    branches:
+      - deploy/electrical-intelligence-rc2
+    paths:
+      - "electrical-intelligence/**"
+      - ".github/workflows/deploy-electrical-intelligence-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: electrical-intelligence-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Publish isolated preview
+    if: ${{ hashFiles('electrical-intelligence/index.html') != '' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout deployment branch
+        uses: actions/checkout@v4
+      - name: Verify expected static app exists
+        run: |
+          test -s electrical-intelligence/index.html
+          test -s electrical-intelligence/sample_verification_report.html
+          echo "Static preview files are present."
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload preview artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: electrical-intelligence
+      - name: Deploy preview to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
