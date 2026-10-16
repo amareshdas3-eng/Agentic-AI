@@ -21,7 +21,6 @@ concurrency:
 jobs:
   deploy:
     name: Publish isolated preview
-    if: ${{ hashFiles('electrical-intelligence/index.html') != '' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
