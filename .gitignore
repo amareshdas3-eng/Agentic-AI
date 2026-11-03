@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Local Environment
+.env
+.env.local
+
+# Large temporary video renders (keep repo lightweight for GitHub Actions)
+reels/*.mp4
+daily_posts/**/*.mp4
+!assets/*.png

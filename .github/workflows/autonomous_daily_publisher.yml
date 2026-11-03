@@ -1,0 +1,54 @@
+name: Autonomous 2-3x Daily Instagram Publisher
+
+on:
+  schedule:
+    # 04:00 UTC = 09:30 AM IST (Morning Slot: Forensic Teardown Reel)
+    # 09:00 UTC = 02:30 PM IST (Afternoon Slot: Multi-Slide Technical Carousel)
+    # 15:00 UTC = 08:30 PM IST (Evening Slot: 2-Character / Industrial AI Reel)
+    - cron: '0 4,9,15 * * *'
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Publishing Slot to Run'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - morning
+          - afternoon
+          - evening
+
+jobs:
+  publish_content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install opencv-python-headless pillow requests pymupdf
+
+      - name: Run Cloud Multi-Slot Content Dispatcher
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_WEBHOOK_URL: ${{ secrets.INSTAGRAM_WEBHOOK_URL }}
+        run: |
+          python cloud_post_scheduler.py --slot ${{ github.event.inputs.slot || 'auto' }}
+
+      - name: Commit Publishing History
+        run: |
+          git config --global user.name "ProEngineering Cloud Bot"
+          git config --global user.email "bot@proengineering.in"
+          git add published_history.json daily_posts/ || true
+          git commit -m "Auto-published Instagram content [$(date -u +'%Y-%m-%d %H:%M UTC')]" || echo "No changes to commit"
+          git push || echo "Push skipped"
