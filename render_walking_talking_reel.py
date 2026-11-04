@@ -228,3 +228,4 @@ def render_walking_talking_reel(duration_sec=8, fps=30):
 
 if __name__ == "__main__":
     render_walking_talking_reel()
+

@@ -189,3 +189,4 @@ def render_live_demonstration_video(duration_sec=8, fps=30):
 
 if __name__ == "__main__":
     render_live_demonstration_video()
+
