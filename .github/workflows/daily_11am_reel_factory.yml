@@ -1,0 +1,54 @@
+name: ProEngineering Cloud Reel Factory (11:00 AM IST)
+
+on:
+  schedule:
+    # 05:30 UTC = 11:00 AM IST every day
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+    inputs:
+      topic_id:
+        description: 'Specific Topic ID to generate (leave empty for auto-rotation)'
+        required: false
+        default: ''
+
+jobs:
+  produce_and_publish_reel:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System FFmpeg & Audio Codecs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install opencv-python-headless pillow requests numpy pymupdf
+
+      - name: Run Cloud Reel Factory (11:00 AM IST Production)
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOPIC_OVERRIDE: ${{ github.event.inputs.topic_id }}
+        run: |
+          python cloud_reel_factory.py
+
+      - name: Commit & Push Publication Telemetry
+        run: |
+          git config --global user.name "ProEngineering Cloud Factory"
+          git config --global user.email "bot@proengineering.in"
+          git add published_history.json daily_posts/ || true
+          git commit -m "Cloud Reel Published at 11:00 AM IST [$(date -u +'%Y-%m-%d %H:%M UTC')]" || echo "No changes to commit"
+          git push || echo "Push skipped"
