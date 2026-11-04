@@ -1,0 +1,14 @@
+{
+  "demo_01_substation": {
+    "title": "LIVE DEMO: 33kV ZERO-TRIP ENERGIZATION",
+    "video_file": "d:/instagram/reels/reel_live_demo_01_substation.mp4",
+    "keyword": "DEMO",
+    "caption": "Factory Acceptance Tests (FAT) never replace site secondary injection! ⚡ Here is a live demonstration of why 33 kV transformer breakers trip on Day-1 no-load soak, and the exact 4-step sign-off protocol:\n\n1️⃣ Live 3-Phase Secondary Injection ramp test with OMICRON CMC 356\n2️⃣ Enabling 15% 2nd-Harmonic Inrush Restraint on MiCOM P643 / ABB RET670 relays\n3️⃣ Confirming Dyn11 30° vector group compensation & single-point CT star grounding\n4️⃣ Millisecond VCB timing analysis (Opening < 45ms, Contact Bounce < 3ms)\n\n👇 Comment DEMO below and I'll send you my complete 33 kV Substation & Relay Commissioning Protocol PDF! (Or grab tools at proengineering.in)\n\n#SubstationCommissioning #Switchgear #PowerSystems #ElectricalEngineering #ProtectionRelays #OMICRON #IndustrialAI #ProEngineering"
+  },
+  "demo_02_p6_ai": {
+    "title": "LIVE DEMO: AGENTIC AI PRIMAVERA P6 SCHEDULE AUDIT",
+    "video_file": "d:/instagram/reels/reel_live_demo_02_p6_ai.mp4",
+    "keyword": "P6",
+    "caption": "Why do 80% of megaproject EPC schedules show 'On Track' until substation energization slips by 6 weeks? Hidden float traps and artificial Start-to-Start lags! 🤖\n\nWatch this live demonstration of our Agentic AI auditing 3,420 activities in Primavera P6:\n1️⃣ Detects artificial SS+15d lags on relay testing precursor milestones\n2️⃣ Audits negative float (-42 days) on statutory inspectorate clearance\n3️⃣ Re-sequences critical path milestones and protects $280K liquidated damages\n\n👇 Comment P6 below and I'll DM you my Primavera P6 AI Schedule Health Playbook!\n\n#PrimaveraP6 #ProjectControls #ProjectManagement #PMP #EPC #IndustrialAI #ProEngineering"
+  }
+}
