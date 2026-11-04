@@ -195,7 +195,7 @@ def select_topic_for_slot(slot):
     return random.choice(unseen)
 
 def render_slot_reel(out_path, topic, slot_name):
-    # 1080 x 1920 vertical MP4 video
+    # 1080 x 1920 vertical MP4 video with User Photo & Fast-Paced Kinetic Editing
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     fps = 30
     duration_sec = 6
@@ -209,47 +209,72 @@ def render_slot_reel(out_path, topic, slot_name):
     }
     accent_color, slot_tag = color_map.get(slot_name, ((0, 242, 254), "PROENGINEERING"))
     
+    # Load User Photo for Authentic Human Authority
+    user_photo_path = os.path.join(ASSETS_DIR, "user_photo.jpg")
+    if os.path.exists(user_photo_path):
+        user_img = Image.open(user_photo_path).convert("RGBA")
+    else:
+        user_img = Image.new("RGBA", (360, 460), (30, 40, 55))
+        
     for frame_idx in range(total_frames):
+        t = frame_idx / fps
         t_frac = frame_idx / total_frames
         img = Image.new("RGB", (1080, 1920), (13, 17, 23))
         draw = ImageDraw.Draw(img)
         
+        # Grid lines
+        for gx in range(0, 1080, 60):
+            draw.line([(gx, 0), (gx, 1920)], fill=(18, 24, 34), width=1)
+        for gy in range(0, 1920, 60):
+            draw.line([(0, gy), (1080, gy)], fill=(18, 24, 34), width=1)
+            
+        # Top Progress Retention Bar
+        prog_w = int(t_frac * 1080)
+        draw.rectangle([0, 0, prog_w, 12], fill=accent_color)
+        
         # Header
-        draw.rectangle([0, 0, 1080, 140], fill=(16, 22, 30))
-        draw.line([(0, 140), (1080, 140)], fill=accent_color, width=3)
+        draw.rectangle([0, 12, 1080, 130], fill=(16, 22, 30))
+        draw.line([(0, 130), (1080, 130)], fill=accent_color, width=3)
         draw.text((50, 40), "⚡ PROENGINEERING | 23+ YRS INDUSTRIAL AI", font=get_font(28, bold=True), fill=accent_color)
         
-        # Tag
-        draw.rounded_rectangle([60, 170, 480, 225], radius=8, fill=(25, 35, 48), outline=accent_color, width=2)
-        draw.text((80, 185), slot_tag, font=get_font(20, bold=True), fill=accent_color)
+        # User Authentic Photo with Camera Cut-Zoom
+        zoom = 1.10 if (1.8 <= t < 3.8) else 1.0
+        uw, uh = int(320 * zoom), int(400 * zoom)
+        u_resized = user_img.resize((uw, uh), Image.Resampling.LANCZOS)
+        ux, uy = 540 - uw // 2, 360 - uh // 2
+        
+        draw.rounded_rectangle([ux - 6, uy - 6, ux + uw + 6, uy + uh + 6], radius=18, outline=accent_color, width=3)
+        img.paste(u_resized, (ux, uy))
         
         # Hook Card
-        draw.rounded_rectangle([60, 250, 1020, 520], radius=16, fill=(22, 27, 34), outline=accent_color, width=3)
-        draw.text((90, 280), topic["title"].upper(), font=get_font(38, bold=True), fill=accent_color)
-        draw.text((90, 360), topic["hook"][:60], font=get_font(28, bold=False), fill=(255, 255, 255))
+        draw.rounded_rectangle([60, 580, 1020, 780], radius=16, fill=(22, 27, 34), outline=accent_color, width=3)
+        draw.text((90, 605), topic["title"].upper(), font=get_font(36, bold=True), fill=accent_color)
+        draw.text((90, 675), topic["hook"][:60], font=get_font(26, bold=False), fill=(255, 255, 255))
         if len(topic["hook"]) > 60:
-            draw.text((90, 410), topic["hook"][60:], font=get_font(28, bold=False), fill=(255, 255, 255))
+            draw.text((90, 720), topic["hook"][60:], font=get_font(26, bold=False), fill=(255, 255, 255))
             
-        # Facts / Insights
-        y = 560
+        # Rapid-Fire Insights (Appearing sequentially)
+        y = 810
         for i, fact in enumerate(topic["facts"]):
-            draw.rounded_rectangle([60, y, 1020, y+240], radius=12, fill=(18, 25, 36), outline=(40, 52, 70), width=2)
-            draw.text((90, y+25), f"INSIGHT 0{i+1}:", font=get_font(24, bold=True), fill=accent_color)
-            draw.text((90, y+80), fact[:70], font=get_font(22, bold=False), fill=(230, 240, 250))
-            if len(fact) > 70:
-                draw.text((90, y+125), fact[70:140], font=get_font(22, bold=False), fill=(230, 240, 250))
-            y += 270
+            if t >= (i * 1.5): # Sequentially pop up
+                draw.rounded_rectangle([60, y, 1020, y+230], radius=12, fill=(18, 25, 36), outline=(40, 52, 70), width=2)
+                draw.text((90, y+25), f"INSIGHT 0{i+1}:", font=get_font(24, bold=True), fill=accent_color)
+                draw.text((90, y+75), fact[:65], font=get_font(22, bold=False), fill=(230, 240, 250))
+                if len(fact) > 65:
+                    draw.text((90, y+115), fact[65:130], font=get_font(22, bold=False), fill=(230, 240, 250))
+            y += 255
             
         # Bottom CTA
-        draw.rectangle([0, 1740, 1080, 1920], fill=(16, 22, 30))
-        draw.rounded_rectangle([80, 1770, 1000, 1870], radius=16, fill=(22, 27, 34), outline=(0, 255, 140), width=3)
-        draw.text((160, 1805), f"COMMENT \"{topic['keyword']}\" FOR FULL PDF CHECKLIST", font=get_font(30, bold=True), fill=(0, 255, 140))
+        draw.rectangle([0, 1680, 1080, 1920], fill=(16, 22, 30))
+        draw.rounded_rectangle([80, 1720, 1000, 1840], radius=16, fill=(22, 27, 34), outline=(0, 255, 140), width=3)
+        draw.text((150, 1760), f"COMMENT \"{topic['keyword']}\" FOR FULL PDF CHECKLIST", font=get_font(30, bold=True), fill=(0, 255, 140))
+        draw.text((310, 1865), "⚡ proengineering.in | Senior Power Systems Lead", font=get_font(20, bold=False), fill=(180, 200, 220))
         
         frame = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         out.write(frame)
         
     out.release()
-    print(f"Rendered Slot Reel: {out_path}")
+    print(f"Rendered Slot Reel with User Photo: {out_path}")
 
 def render_slot_carousel(folder_path, topic):
     os.makedirs(folder_path, exist_ok=True)
@@ -360,3 +385,4 @@ if __name__ == "__main__":
             dispatch_post(s)
     else:
         dispatch_post(args.slot)
+
