@@ -52,3 +52,4 @@ jobs:
           git add published_history.json daily_posts/ || true
           git commit -m "Auto-published Instagram content [$(date -u +'%Y-%m-%d %H:%M UTC')]" || echo "No changes to commit"
           git push || echo "Push skipped"
+
