@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProEngineering | Industrial AI & Megaproject Toolkit</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --cyan: #00f2fe;
+      --gold: #ffb800;
+      --red: #ff4d4f;
+      --green: #00ff88;
+      --text: #f0f6fc;
+      --text-muted: #8b949e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; }
+    body { background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header { border-bottom: 2px solid var(--cyan); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+    .brand-title { font-size: 26px; color: var(--cyan); font-weight: 800; }
+    .brand-tag { font-size: 14px; color: var(--gold); font-weight: 600; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media(max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+    .card-title { font-size: 20px; font-weight: 700; color: var(--cyan); margin-bottom: 16px; border-left: 4px solid var(--cyan); padding-left: 10px; }
+    .card-title.gold { color: var(--gold); border-left-color: var(--gold); }
+    .input-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+    input, select { width: 100%; background: #0b0e14; border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: var(--text); font-size: 14px; }
+    input:focus { border-color: var(--cyan); outline: none; }
+    .result-box { background: #0b0e14; border: 1px solid var(--cyan); border-radius: 8px; padding: 16px; margin-top: 20px; }
+    .result-value { font-size: 28px; font-weight: 800; color: var(--cyan); }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+    .badge-green { background: rgba(0, 255, 136, 0.2); color: var(--green); border: 1px solid var(--green); }
+    .badge-red { background: rgba(255, 77, 79, 0.2); color: var(--red); border: 1px solid var(--red); }
+    .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
+    .checklist-item input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--cyan); cursor: pointer; }
+    .risk-meter { height: 12px; border-radius: 6px; background: #222; margin: 15px 0; overflow: hidden; }
+    .risk-bar { height: 100%; width: 0%; transition: width 0.3s, background-color 0.3s; }
+    .cta-banner { background: linear-gradient(135deg, #161b22 0%, #1f2937 100%); border: 2px solid var(--gold); border-radius: 12px; padding: 24px; margin-top: 30px; text-align: center; }
+    .btn { background: var(--cyan); color: #000; font-weight: 800; padding: 12px 28px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; text-decoration: none; display: inline-block; margin-top: 15px; }
+    .btn:hover { background: #40f7ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="brand-title">⚡ PROENGINEERING INDUSTRIAL TOOLKIT</div>
+        <div class="brand-tag">23+ Years Power Systems & Megaproject Authority | Agentic AI Controls</div>
+      </div>
+      <div>
+        <button class="btn" style="background:var(--gold); color:#000;" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Calculator 1: CT Knee-Point Voltage -->
+      <div class="card">
+        <div class="card-title">1. Class PS CT Knee-Point (Vk) Calculator</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">
+          Formula: \( V_k \ge 2 \times I_{f(sec)} \times (R_{ct} + 2R_L + R_r) \)
+        </p>
+        <div class="input-group">
+          <label>Max Through-Fault Current (kA):</label>
+          <input type="number" id="faultCurrent" value="31.5" step="0.5" oninput="calcVk()">
+        </div>
+        <div class="input-group">
+          <label>CT Primary Rating (A):</label>
+          <input type="number" id="ctPrimary" value="600" step="50" oninput="calcVk()">
+        </div>
+        <div class="input-group">
+          <label>CT Secondary Rating (A):</label>
+          <select id="ctSecondary" onchange="calcVk()">
+            <option value="1">1 Ampere (Standard for 33kV outdoor switchyard)</option>
+            <option value="5">5 Amperes (Indoor / Short lead runs)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>CT Secondary Internal Resistance \(R_{ct}\) (&Omega;):</label>
+          <input type="number" id="rct" value="2.5" step="0.1" oninput="calcVk()">
+        </div>
+        <div class="input-group">
+          <label>One-Way Cable Lead Resistance \(R_L\) (&Omega;):</label>
+          <input type="number" id="rl" value="1.2" step="0.1" oninput="calcVk()">
+        </div>
+        <div class="input-group">
+          <label>Numerical Relay Burden \(R_r\) (&Omega;):</label>
+          <input type="number" id="rr" value="0.1" step="0.05" oninput="calcVk()">
+        </div>
+
+        <div class="result-box">
+          <div style="font-size:12px; color:var(--text-muted);">MINIMUM SPECIFIED KNEE-POINT VOLTAGE:</div>
+          <div class="result-value" id="vkResult">535.5 V</div>
+          <div id="vkBadge" class="badge badge-green">Class PS Compliant</div>
+          <div style="font-size:12px; color:#aaa; margin-top:8px;" id="vkDetail">
+            Secondary Fault Current: 52.5 A | Total Loop Impedance: 5.1 &Omega;
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool 2: Pre-Bid Spec-vs-Drawing Risk Audit -->
+      <div class="card">
+        <div class="card-title gold">2. Pre-Bid Change Order Risk Audit</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">
+          Audit tender drawings vs specs to detect potential $400K+ scope creep before bid submission:
+        </p>
+
+        <div id="checklist">
+          <div class="checklist-item">
+            <input type="checkbox" onchange="calcRisk()">
+            <div>Division 26 spec states 40kA (3s), but BOQ specifies 31.5kA (1s).</div>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" onchange="calcRisk()">
+            <div>Tender SLD conflicts with site trench physical cable route length.</div>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" onchange="calcRisk()">
+            <div>Soil thermal resistivity is assumed 1.2 K.m/W without actual site test.</div>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" onchange="calcRisk()">
+            <div>IEC 61850 PRP/HSR redundant gateway licenses not included in BOQ.</div>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" onchange="calcRisk()">
+            <div>Transformer Dyn11 vector group compensation not confirmed in relay spec.</div>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" onchange="calcRisk()">
+            <div>Third-party OMICRON secondary injection witnessing fee unbudgeted.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div style="display:flex; justify-content:space-between; font-size:13px;">
+            <span>CHANGE ORDER RISK INDEX:</span>
+            <span id="riskLabel" style="font-weight:700; color:var(--green);">LOW RISK (0/6)</span>
+          </div>
+          <div class="risk-meter">
+            <div id="riskBar" class="risk-bar" style="width:0%; background:var(--green);"></div>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted);" id="riskEstimatedCost">
+            Estimated Unbudgeted Risk Exposure: $0
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Banner -->
+    <div class="cta-banner">
+      <h2 style="color:var(--gold); margin-bottom:10px;">Need a Complete Forensic Spec Audit or Substation RCA?</h2>
+      <p style="color:#d0d7de; max-width:800px; margin:0 auto; font-size:14px; line-height:1.6;">
+        ProEngineering partners with EPC Directors, Project Leads, and Plant Owners across L&T, ABB, and global complexes to prevent liquidated damages, optimize Primavera P6 schedules, and automate engineering workflows via Agentic AI.
+      </p>
+      <a href="https://proengineering.in" class="btn" target="_blank">Book a 30-Minute Advisory Diagnostic</a>
+    </div>
+  </div>
+
+  <script>
+    function calcVk() {
+      const ifault = parseFloat(document.getElementById('faultCurrent').value) * 1000;
+      const pri = parseFloat(document.getElementById('ctPrimary').value);
+      const sec = parseFloat(document.getElementById('ctSecondary').value);
+      const rct = parseFloat(document.getElementById('rct').value);
+      const rl = parseFloat(document.getElementById('rl').value);
+      const rr = parseFloat(document.getElementById('rr').value);
+
+      const ratio = pri / sec;
+      const ifSec = ifault / ratio;
+      const loopR = rct + (2 * rl) + rr;
+      const vk = 2 * ifSec * loopR;
+
+      document.getElementById('vkResult').innerText = vk.toFixed(1) + " V";
+      document.getElementById('vkDetail').innerText = 
+        `Secondary Fault Current: ${ifSec.toFixed(1)} A | Total Loop Impedance: ${loopR.toFixed(2)} \u03A9`;
+
+      const badge = document.getElementById('vkBadge');
+      if (vk > 800) {
+        badge.className = "badge badge-red";
+        badge.innerText = "High Knee-Point Required - Check CT Core Size & Cable Length";
+      } else {
+        badge.className = "badge badge-green";
+        badge.innerText = "Class PS Standard Sizing Compliant";
+      }
+    }
+
+    function calcRisk() {
+      const boxes = document.querySelectorAll('#checklist input[type="checkbox"]');
+      let checked = 0;
+      boxes.forEach(b => { if (b.checked) checked++; });
+
+      const pct = (checked / boxes.length) * 100;
+      const bar = document.getElementById('riskBar');
+      const label = document.getElementById('riskLabel');
+      const cost = document.getElementById('riskEstimatedCost');
+
+      bar.style.width = pct + "%";
+
+      if (checked <= 1) {
+        bar.style.backgroundColor = "var(--green)";
+        label.style.color = "var(--green)";
+        label.innerText = `LOW RISK (${checked}/6)`;
+        cost.innerText = `Estimated Unbudgeted Risk Exposure: $${checked * 40000}`;
+      } else if (checked <= 3) {
+        bar.style.backgroundColor = "var(--gold)";
+        label.style.color = "var(--gold)";
+        label.innerText = `MODERATE RISK (${checked}/6)`;
+        cost.innerText = `Estimated Unbudgeted Risk Exposure: $${checked * 65000}`;
+      } else {
+        bar.style.backgroundColor = "var(--red)";
+        label.style.color = "var(--red)";
+        label.innerText = `CRITICAL RISK (${checked}/6) - AUDIT REQUIRED!`;
+        cost.innerText = `Estimated Unbudgeted Risk Exposure: $${250000 + (checked * 50000)}`;
+      }
+    }
+
+    calcVk();
+  </script>
+</body>
+</html>
+

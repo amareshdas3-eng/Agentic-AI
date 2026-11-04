@@ -28,3 +28,4 @@ Write-Host "[SUCCESS] Highlighted video in Explorer: $videoPath" -ForegroundColo
 # 3. Launch Instagram Create in Google Chrome
 Start-Process "chrome.exe" "https://www.instagram.com"
 Write-Host "[SUCCESS] Opened Instagram in Chrome. Ready to drag and drop!" -ForegroundColor Yellow
+

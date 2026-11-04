@@ -11,3 +11,4 @@ __pycache__/
 reels/*.mp4
 daily_posts/**/*.mp4
 !assets/*.png
+
