@@ -1,8 +1,8 @@
-# ========================================================
+﻿# ========================================================
 # ProEngineering 1-Click Publishing Assistant: 3D Demo Reel
 # ========================================================
 
-$videoPath = "d:\instagram\reels\reel_3d_live_person_demo.mp4"
+$videoPath = "d:\instagram\reels\reel_09_transformer_differential_protection.mp4"
 $caption = @"
 Watching 33kV transformer differential protection in 3D changes how you commission substations forever! ⚡ In this 3D live demonstration, we step into the substation digital twin:
 
@@ -27,3 +27,4 @@ Write-Host "[SUCCESS] Highlighted 3D video in Explorer: $videoPath" -ForegroundC
 # 3. Launch Instagram Create in Google Chrome
 Start-Process "chrome.exe" "https://www.instagram.com"
 Write-Host "[SUCCESS] Opened Instagram in Chrome. Ready to drag and drop!" -ForegroundColor Yellow
+

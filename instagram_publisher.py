@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import requests
 
 class InstagramPublisher:
@@ -34,7 +35,12 @@ class InstagramPublisher:
             "caption": caption,
             "access_token": self.access_token
         }
-        res = requests.post(init_url, data=params).json()
+        try:
+            res = requests.post(init_url, data=params, timeout=30).json()
+        except Exception as e:
+            print(f"[ERROR] Container creation request failed: {e}")
+            return False
+
         container_id = res.get("id")
         if not container_id:
             print(f"[ERROR] Failed to create media container: {res}")
@@ -42,10 +48,51 @@ class InstagramPublisher:
 
         print(f"[SUCCESS] Media container created: {container_id}")
 
-        # Step 2: Publish Media Container
+        # Step 2: Poll Container Status until FINISHED
+        poll_url = f"{self.graph_base_url}/{container_id}"
+        max_attempts = 30
+        for attempt in range(max_attempts):
+            time.sleep(5)
+            try:
+                status_res = requests.get(
+                    poll_url,
+                    params={"fields": "status_code,status", "access_token": self.access_token},
+                    timeout=15
+                ).json()
+            except Exception as e:
+                print(f"[WARN] Status poll attempt {attempt + 1} encountered network error: {e}")
+                continue
+
+            if "error" in status_res:
+                print(f"[ERROR] Meta Graph API error during polling: {status_res['error']}")
+                return False
+
+            code = status_res.get("status_code")
+            print(f"[META] Container Status (attempt {attempt + 1}/{max_attempts}): {code}")
+
+            if code == "FINISHED":
+                break
+            elif code in ["ERROR", "EXPIRED"]:
+                print(f"[ERROR] Container processing terminated with status: {code} ({status_res})")
+                return False
+        else:
+            print("[ERROR] Container processing timed out after 150s before reaching FINISHED.")
+            return False
+
+        # Step 3: Publish Media Container
         publish_url = f"{self.graph_base_url}/{self.ig_user_id}/media_publish"
-        pub_res = requests.post(publish_url, data={"creation_id": container_id, "access_token": self.access_token}).json()
-        print(f"[SUCCESS] Published Reel ID: {pub_res.get('id')}")
+        try:
+            pub_res = requests.post(publish_url, data={"creation_id": container_id, "access_token": self.access_token}, timeout=30).json()
+        except Exception as e:
+            print(f"[ERROR] Media publish request failed: {e}")
+            return False
+
+        published_id = pub_res.get("id")
+        if not published_id:
+            print(f"[ERROR] Media publish failed: {pub_res}")
+            return False
+
+        print(f"[SUCCESS] Published Reel ID: {published_id}")
         return True
 
     def stage_post_for_user(self, video_path, caption_path):
@@ -62,4 +109,3 @@ class InstagramPublisher:
 if __name__ == "__main__":
     publisher = InstagramPublisher()
     print("Instagram Publisher Engine Initialized.")
-

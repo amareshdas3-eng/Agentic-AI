@@ -199,11 +199,24 @@ def render_broadcast_video(out_mp4, topic):
     out.release()
     print(f"[SUCCESS] Video rendered at: {out_mp4}")
 
+def get_ffmpeg_binary():
+    """Locates FFmpeg binary: checks system PATH first, then falls back to imageio_ffmpeg."""
+    import shutil
+    ffmpeg_path = shutil.which("ffmpeg")
+    if ffmpeg_path:
+        return ffmpeg_path
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return "ffmpeg"
+
 def mux_audio_and_video(video_path, audio_path, final_output):
     """Muxes video and audio with FFmpeg if available, or renames video as final output."""
+    ffmpeg_bin = get_ffmpeg_binary()
     try:
         cmd = [
-            "ffmpeg", "-y",
+            ffmpeg_bin, "-y",
             "-i", video_path,
             "-i", audio_path,
             "-c:v", "libx264",
@@ -214,8 +227,10 @@ def mux_audio_and_video(video_path, audio_path, final_output):
         ]
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if res.returncode == 0 and os.path.exists(final_output):
-            print(f"[FFMPEG] Successfully muxed H.264/AAC video: {final_output}")
+            print(f"[FFMPEG] Successfully muxed H.264/AAC video via {os.path.basename(ffmpeg_bin)}: {final_output}")
             return final_output
+        else:
+            print(f"[WARN] FFmpeg returned non-zero ({res.returncode}): {res.stderr.decode('utf-8', errors='ignore')}")
     except Exception as e:
         print(f"[WARN] FFmpeg mux skipped ({e}). Using base video.")
         
@@ -255,9 +270,13 @@ class MetaInstagramReelPublisher:
 
         # Step 2: Poll Container Status until FINISHED
         poll_url = f"{self.graph_base_url}/{container_id}"
-        for _ in range(30):
+        max_attempts = 30
+        for attempt in range(max_attempts):
             time.sleep(5)
             status_res = requests.get(poll_url, params={"fields": "status_code,status", "access_token": self.access_token}).json()
+            if "error" in status_res:
+                print(f"[ERROR] Container polling failed: {status_res['error']}")
+                return {"status": "ERROR", "error": status_res}
             code = status_res.get("status_code")
             print(f"[META] Container Status: {code}")
             if code == "FINISHED":
@@ -265,11 +284,17 @@ class MetaInstagramReelPublisher:
             elif code in ["ERROR", "EXPIRED"]:
                 print(f"[ERROR] Container processing failed: {status_res}")
                 return {"status": "ERROR", "error": status_res}
+        else:
+            print("[ERROR] Container processing timed out before reaching FINISHED.")
+            return {"status": "ERROR", "error": "Container processing timed out"}
 
         # Step 3: Publish Media Container
         pub_url = f"{self.graph_base_url}/{self.ig_user_id}/media_publish"
         pub_res = requests.post(pub_url, data={"creation_id": container_id, "access_token": self.access_token}).json()
         post_id = pub_res.get("id")
+        if not post_id:
+            print(f"[ERROR] Media publish failed: {pub_res}")
+            return {"status": "ERROR", "error": pub_res}
         print(f"[SUCCESS] Reel Published to Instagram! Post ID: {post_id}")
         return {"status": "PUBLISHED", "post_id": post_id}
 
